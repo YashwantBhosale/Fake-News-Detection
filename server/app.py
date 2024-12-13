@@ -9,13 +9,15 @@ import joblib
 import os
 from flask_cors import CORS
 import re
-from nltk.stem.porter import PorterStemmer
+import nltk
 from nltk.corpus import stopwords
+from nltk.stem.porter import PorterStemmer
 import string
 from dotenv import load_dotenv
 
 # global declarations
 ps = PorterStemmer()
+nltk.download("stopwords")
 stop_words = set(stopwords.words("english"))
 
 load_dotenv()
@@ -209,4 +211,4 @@ def login():
 """
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=False)
