@@ -1,12 +1,11 @@
 from flask import Flask, request, jsonify
-from pymongo import MongoClient
-from bson import ObjectId
-import pandas as pd
+# from pymongo import MongoClient
+# from bson import ObjectId
 import numpy as np
 import joblib
-import bcrypt
-import jwt
-import datetime
+# import bcrypt
+# import jwt
+# import datetime
 import os
 from flask_cors import CORS
 import re
@@ -21,33 +20,39 @@ stop_words = set(stopwords.words("english"))
 
 load_dotenv()
 
+
 def clean_text(text):
     text = text.lower()
     text = re.sub(r"\[.*?]", "", text)
     url = re.compile(r"https?://\S+|www.\.\S+")
     text = url.sub(r"", text)
-    text = re.sub(r"<.*?>", "", text))
+    text = re.sub(r"<.*?>", "", text)
     text = re.sub(r"[%s]" % re.escape(string.punctuation), "", text)
     text = re.sub(r"\w*\d\w*", "", text)
-    return text;
+    return text
+
 
 def stem_text(text):
-    text = [ps.stem(word) if word in text.split() if word not in stop_words]
+    text = [ps.stem(word) for word in text.split() if word not in stop_words]
     return " ".join(text)
 
+
+"""
 SECRET_KEY = os.getenv("SECRET_KEY")
 MONGO_URI = os.getenv("MONGO_URI")
 
 client = MongoClient(MONGO_URI) # db client
+"""
 
 # load pre-fitted vectorizer
-vectorizer - joblib.load("vectorizer.pkl")
+vectorizer = joblib.load("vectorizer.pkl")
 
 app = Flask(__name__)
 CORS(app)
 
 # load pre-trained model
 model = joblib.load("model.pkl")
+
 
 # / route
 @app.route("/", methods=["GET"])
@@ -59,26 +64,26 @@ def home():
 def predict():
     try:
         data = request.get_json(force=True)
-        
+
         # Ensure that 'news' exists in the incoming data
-        if 'news' not in data:
-            return jsonify({ "error": "News field missing!" }), 401
+        if "news" not in data:
+            return jsonify({"error": "News field missing!"}), 401
 
         # Following is jwt code uncomment if user authentication is being used
-        '''
+        """
         token = request.headers.get("Authorization")
         if not token:
             return jsonify({ "error": "JWT token missing!" }), 401
-        '''
+        """
 
         # Following code is for storing news in database again use if authentication + database is being used
-        '''
+        """
         db = client["news"]
         collection = db["news"]
         users_collection = db["users"]
-        '''
-        
-        '''
+        """
+
+        """
         try:
             decoded_token = jwt.decode(
                 token.split(" ")[1], SECRET_KEY, algorithms=["HS256"]
@@ -92,18 +97,18 @@ def predict():
             return jsonify({"error": "Token has expired"}), 401
         except jwt.InvalidTokenError:
             return jsonify({"error": "Invalid token"}), 401 
-        '''
-        
+        """
+
         # clean and preprocess the text
-        raw_text = data["text"]
+        raw_text = data["news"]
         cleaned_text = clean_text(raw_text)
         stemmed_text = stem_text(cleaned_text)
 
         vectorized_data = vectorizer.transform([stemmed_text])
         prediction = model.predict(vectorized_data)
-        prediction = prediction[0]
+        # prediction = prediction[0]
 
-        '''
+        """
         _news = {
             "user_id": str(user["_id"]),
             "text": raw_text,
@@ -113,18 +118,21 @@ def predict():
         }
 
         collection.insert_one(_news)
-        '''
+        """
 
-        return jsonify({ "prediction": prediction }), 200
+        final_prediction = "Real" if prediction == 1 else "Fake"
+        return jsonify({"prediction": str(final_prediction)}), 200
     except Exception as e:
-        return jsonify({"error" : str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
-'''
+
+"""
     Authentication is usually irrelevant for such applications where user just wants to check if
     given news is fake or not. But i have still included the authentication code just in
     case i find some better use case and need it. It also includes jwt based authentication.
-'''
+"""
 
+"""
 @app.route("/signup", methods=["POST"])
 def signup():
     try:
@@ -174,7 +182,7 @@ def login():
             payload = {
                 "user_id" : str(user["_id"]),
                 "role" : user["role"],
-                exp : datetime.datetime.uctnow() + datetime.timedelta(hours=1) # 1 hour expiration time
+                "exp" : datetime.datetime.uctnow() + datetime.timedelta(hours=1) # 1 hour expiration time
             }
 
             token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
@@ -185,7 +193,7 @@ def login():
                         "message" : "Login successful!",
                         "user" : {
                             "username" : user["username"],
-                            "email" : user["email",
+                            "email" : user["email"],
                             "role" : user["role"],
                         },
                         "token" : token
@@ -198,4 +206,7 @@ def login():
         return jsonify({ "error": str(e) }), 500
         
 
+"""
 
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
