@@ -65,9 +65,9 @@ pip install -r requirements.txt
 ```bash
 python app.py
 ```
-5. The service will be available at `http://localhost:5000`
+5. The service will be available at `http://localhost:5000/`
 
-You can now send a POST request to the local server using curl or Postman as described above.
+You can now send a POST request to the local server at `/predict` route using curl or Postman as described above.
 
 ### Contributing
 If you would like to contribute to this project, please feel free to fork the repository and submit a pull request. Any contributions are welcome!
