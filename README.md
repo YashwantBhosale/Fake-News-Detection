@@ -72,8 +72,6 @@ You can now send a POST request to the local server at `/predict` route using cu
 ### Contributing
 If you would like to contribute to this project, please feel free to fork the repository and submit a pull request. Any contributions are welcome!
  
-*The project currently does not have any frontend and is only available as an API service. If you would like to contribute a frontend for the service, that would be greatly appreciated!*
-
 **Steps for contributing**
 1. Fork the repository
 2. Clone the repository
