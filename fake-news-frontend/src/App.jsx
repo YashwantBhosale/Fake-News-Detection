@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import './App.css';
-import LoadingAnimation from './components/spinner';
+import LoadingAnimation from './components/Spinner';
 
 function App() {
   const [news, setNews] = useState(''); // User input
